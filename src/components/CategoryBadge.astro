@@ -1,0 +1,43 @@
+---
+import { findCategory } from '../consts';
+
+interface Props {
+	category?: string;
+	link?: boolean;
+}
+const { category, link = true } = Astro.props;
+const cat = findCategory(category);
+const label = cat?.name ?? category;
+---
+
+{
+	label &&
+		(link && cat ? (
+			<a class="cat-badge" href={`/categoria/${cat.slug}/`}>{label}</a>
+		) : (
+			<span class="cat-badge">{label}</span>
+		))
+}
+
+<style>
+	.cat-badge {
+		display: inline-flex;
+		align-items: center;
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		padding: 0.32em 0.7em;
+		border-radius: var(--radius-full);
+		color: var(--cat);
+		background: var(--cat-soft);
+		border: 1px solid transparent;
+		text-decoration: none;
+		line-height: 1;
+		transition: border-color var(--dur) var(--ease);
+	}
+	a.cat-badge:hover {
+		border-color: var(--cat);
+	}
+</style>

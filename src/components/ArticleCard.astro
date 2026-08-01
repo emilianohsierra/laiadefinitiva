@@ -1,0 +1,101 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+import CategoryBadge from './CategoryBadge.astro';
+import BrandCover from './BrandCover.astro';
+import { readingTime } from '../lib/reading-time';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props;
+const { title, description, pubDate, heroImage, heroImageAlt, category } = post.data;
+const mins = readingTime(post.body);
+const href = `/blog/${post.id}/`;
+---
+
+<article class="card">
+	<a class="card-media" href={href} tabindex="-1" aria-hidden="true">
+		{
+			heroImage ? (
+				<Image src={heroImage} alt={heroImageAlt || title} width={720} height={405} loading="lazy" />
+			) : (
+				<BrandCover title={title} category={category} ratio="16 / 9" />
+			)
+		}
+	</a>
+	<div class="card-body">
+		<CategoryBadge category={category} />
+		<h3 class="card-title"><a href={href}>{title}</a></h3>
+		<p class="card-desc">{description}</p>
+		<div class="card-meta">
+			<FormattedDate date={pubDate} /><span class="dot">·</span>{mins} min
+		</div>
+	</div>
+</article>
+
+<style>
+	.card {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+	.card-media {
+		display: block;
+		border-radius: var(--radius);
+		overflow: hidden;
+		border: 1px solid var(--border);
+		box-shadow: var(--shadow-sm);
+	}
+	.card-media :global(img),
+	.card-media :global(.brand-cover) {
+		width: 100%;
+		height: auto;
+		display: block;
+		border-radius: 0;
+		transition: transform var(--dur-slow) var(--ease);
+	}
+	.card:hover .card-media :global(img),
+	.card:hover .card-media :global(.brand-cover) {
+		transform: scale(1.04);
+	}
+	.card-body {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-2);
+		padding-top: var(--space-4);
+	}
+	.card-title {
+		font-size: 1.2rem;
+		line-height: 1.25;
+		margin: 0.15rem 0 0;
+	}
+	.card-title a {
+		color: var(--text);
+		text-decoration: none;
+		transition: color var(--dur) var(--ease);
+	}
+	.card:hover .card-title a {
+		color: var(--accent);
+	}
+	.card-desc {
+		margin: 0;
+		color: var(--text-muted);
+		font-size: 0.98rem;
+		line-height: 1.55;
+	}
+	.card-meta {
+		margin-top: auto;
+		padding-top: var(--space-1);
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		color: var(--text-subtle);
+		font-size: var(--fs-small);
+	}
+	.dot {
+		opacity: 0.5;
+	}
+</style>

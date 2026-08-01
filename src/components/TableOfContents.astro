@@ -1,0 +1,147 @@
+---
+interface Heading {
+	depth: number;
+	slug: string;
+	text: string;
+}
+interface Props {
+	headings: Heading[];
+}
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+	toc.length > 1 && (
+		<details class="toc" open>
+			<summary class="toc-sum">En este artículo</summary>
+			<nav aria-label="Tabla de contenidos">
+				<ul class="toc-list">
+					{toc.map((h) => (
+						<li class:list={['toc-item', `d${h.depth}`]}>
+							<a href={`#${h.slug}`}>{h.text}</a>
+						</li>
+					))}
+				</ul>
+			</nav>
+		</details>
+	)
+}
+
+<style>
+	/* Anula los estilos globales de details/summary para este bloque */
+	.toc {
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		padding: var(--space-4) var(--space-5);
+		margin: 0;
+		overflow: visible;
+	}
+	.toc-sum {
+		list-style: none;
+		cursor: default;
+		padding: 0;
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--text-subtle);
+		margin-bottom: var(--space-3);
+	}
+	.toc-sum::-webkit-details-marker {
+		display: none;
+	}
+	.toc-sum::after {
+		content: none;
+	}
+	.toc-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.toc-item {
+		margin: 0;
+	}
+	.toc-item a {
+		display: block;
+		padding: 0.35em 0.6em;
+		border-left: 2px solid transparent;
+		border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+		color: var(--text-muted);
+		text-decoration: none;
+		font-size: 0.9rem;
+		line-height: 1.35;
+		transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease),
+			background var(--dur) var(--ease);
+	}
+	.toc-item.d3 a {
+		padding-left: 1.4em;
+		font-size: 0.86rem;
+	}
+	.toc-item a:hover {
+		color: var(--text);
+		background: var(--surface-2);
+	}
+	.toc-item a.active {
+		color: var(--accent);
+		border-left-color: var(--accent);
+		background: var(--accent-soft);
+		font-weight: 600;
+	}
+
+	/* En móvil el TOC se puede colapsar */
+	@media (max-width: 1023px) {
+		.toc-sum {
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 0;
+		}
+		.toc-sum::after {
+			content: '';
+			width: 8px;
+			height: 8px;
+			border-right: 2px solid var(--text-subtle);
+			border-bottom: 2px solid var(--text-subtle);
+			transform: rotate(45deg);
+			transition: transform var(--dur) var(--ease);
+		}
+		.toc[open] .toc-sum::after {
+			transform: rotate(-135deg);
+		}
+		.toc[open] .toc-list {
+			margin-top: var(--space-3);
+		}
+	}
+</style>
+
+<script>
+	const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc a[href^="#"]'));
+	if (links.length) {
+		const byId = new Map<string, HTMLAnchorElement>();
+		links.forEach((l) => byId.set(decodeURIComponent(l.getAttribute('href')!.slice(1)), l));
+		const targets = Array.from(
+			document.querySelectorAll<HTMLElement>('article h2[id], article h3[id]'),
+		);
+		if (targets.length) {
+			const io = new IntersectionObserver(
+				(entries) => {
+					for (const e of entries) {
+						if (e.isIntersecting) {
+							links.forEach((l) => l.classList.remove('active'));
+							byId.get(e.target.id)?.classList.add('active');
+						}
+					}
+				},
+				{ rootMargin: '-88px 0px -68% 0px', threshold: 0 },
+			);
+			targets.forEach((t) => io.observe(t));
+		}
+	}
+</script>

@@ -1,0 +1,86 @@
+---
+import { SITE_TITLE, SITE_AUTHOR } from '../consts';
+import type { Faq } from '../lib/faq';
+
+interface Props {
+	title: string;
+	description: string;
+	pubDate: Date;
+	updatedDate?: Date;
+	author?: string;
+	categoryName?: string;
+	categorySlug?: string;
+	imageUrl?: string;
+	faqs?: Faq[];
+}
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	author,
+	categoryName,
+	categorySlug,
+	imageUrl,
+	faqs = [],
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://laiadefinitiva.com');
+const url = new URL(Astro.url.pathname, site).href;
+const authorName = author || SITE_AUTHOR;
+
+const article: Record<string, unknown> = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: title,
+	description,
+	datePublished: pubDate.toISOString(),
+	dateModified: (updatedDate ?? pubDate).toISOString(),
+	author: { '@type': 'Person', name: authorName },
+	publisher: {
+		'@type': 'Organization',
+		name: SITE_TITLE,
+		logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', site).href },
+	},
+	mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+	inLanguage: 'es',
+};
+if (imageUrl) article.image = imageUrl;
+
+const crumbs = [
+	{ name: 'Inicio', item: site.href },
+	{ name: 'Blog', item: new URL('/blog/', site).href },
+];
+if (categoryName && categorySlug) {
+	crumbs.push({ name: categoryName, item: new URL(`/categoria/${categorySlug}/`, site).href });
+}
+crumbs.push({ name: title, item: url });
+
+const breadcrumb = {
+	'@context': 'https://schema.org',
+	'@type': 'BreadcrumbList',
+	itemListElement: crumbs.map((c, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: c.name,
+		item: c.item,
+	})),
+};
+
+const faqSchema =
+	faqs.length > 0
+		? {
+				'@context': 'https://schema.org',
+				'@type': 'FAQPage',
+				mainEntity: faqs.map((f) => ({
+					'@type': 'Question',
+					name: f.q,
+					acceptedAnswer: { '@type': 'Answer', text: f.a },
+				})),
+			}
+		: null;
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(article)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />
+{faqSchema && <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />}

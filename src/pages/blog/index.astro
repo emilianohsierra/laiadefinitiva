@@ -1,114 +1,110 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import Footer from '../../components/Footer.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { SITE_TITLE } from '../../consts';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const posts = (await getCollection('blog'))
+	.filter((p) => !p.data.draft)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const title = `Blog — ${SITE_TITLE}`;
+const description =
+	'Todas las guías y comparativas de herramientas de IA, probadas en proyectos reales. Sin relleno, sin humo.';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
+		<BaseHead title={title} description={description} />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
+		<main class="blog">
+			<header class="blog-hero">
+				<p class="blog-eyebrow">El blog</p>
+				<h1 class="blog-title">Todo lo que publicamos</h1>
+				<p class="blog-lead">
+					Guías, comparativas y tutoriales de IA probados en proyectos reales. Cuando algo tiene un
+					pero, lo digo.
+				</p>
+			</header>
+
+			{
+				posts.length > 0 ? (
+					<div class="grid">
+						{posts.map((post) => (
+							<ArticleCard post={post} />
+						))}
+					</div>
+				) : (
+					<section class="empty">
+						<p>Muy pronto: los primeros artículos están en camino.</p>
+					</section>
+				)
+			}
+
+			<section class="nl-wrap">
+				<Newsletter />
 			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	.blog {
+		width: var(--page-max);
+		max-width: calc(100% - 2 * var(--gutter));
+	}
+	.blog-hero {
+		padding: clamp(2rem, 1.2rem + 4vw, 4rem) 0 clamp(1.5rem, 1rem + 3vw, 3rem);
+		max-width: 46rem;
+	}
+	.blog-eyebrow {
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.16em;
+		color: var(--accent);
+		margin: 0 0 var(--space-3);
+	}
+	.blog-title {
+		font-size: var(--fs-h1);
+		margin: 0 0 var(--space-4);
+	}
+	.blog-lead {
+		font-size: var(--fs-lead);
+		color: var(--text-muted);
+		line-height: 1.5;
+		margin: 0;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--space-7) var(--space-5);
+	}
+	@media (max-width: 900px) {
+		.grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (max-width: 600px) {
+		.grid {
+			grid-template-columns: 1fr;
+			gap: var(--space-6);
+		}
+	}
+	.empty {
+		padding: var(--space-8) 0;
+		text-align: center;
+		color: var(--text-muted);
+	}
+	.nl-wrap {
+		margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+	}
+</style>

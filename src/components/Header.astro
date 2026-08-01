@@ -1,52 +1,317 @@
 ---
-import { SITE_TITLE } from '../consts';
-import HeaderLink from './HeaderLink.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { CATEGORIES } from '../consts';
+
+const path = Astro.url.pathname;
+const clean = (s: string) => (s.length > 1 ? s.replace(/\/$/, '') : s);
+const here = clean(path);
+const isActive = (href: string) => here === clean(href);
+const isCat = (slug: string) => here === `/categoria/${slug}`;
+
+const utility = [
+	{ href: '/blog/', label: 'Blog' },
+	{ href: '/about/', label: 'Acerca de' },
+];
 ---
 
-<header>
- <nav>
- <h2><a href="/">{SITE_TITLE}</a></h2>
- <div class="internal-links">
- <HeaderLink href="/">Inicio</HeaderLink>
- <HeaderLink href="/blog">Blog</HeaderLink>
- <HeaderLink href="/about">Acerca de</HeaderLink>
- </div>
- </nav>
-</header>
-<style>
- header {
- margin: 0;
- padding: 0 1em;
- background: white;
- box-shadow: 0 2px 8px rgba(var(--black), 5%);
- }
- h2 {
- margin: 0;
- font-size: 1em;
- }
+<header class="site-header">
+	<div class="bar">
+		<a class="brand" href="/" aria-label="La IA Definitiva — inicio">
+			<span class="brand-mark" aria-hidden="true">IA</span>
+			<span class="brand-name">La IA Definitiva</span>
+		</a>
 
- h2 a,
- h2 a.active {
- text-decoration: none;
- }
- nav {
- display: flex;
- align-items: center;
- justify-content: space-between;
- }
- nav a {
- padding: 1em 0.5em;
- color: var(--black);
- border-bottom: 4px solid transparent;
- text-decoration: none;
- }
- nav a.active {
- text-decoration: none;
- border-bottom-color: var(--accent);
- }
- @media (max-width: 720px) {
- .internal-links {
- display: flex;
- }
- }
+		<nav class="utility" aria-label="Navegación">
+			{
+				utility.map((l) => (
+					<a href={l.href} class:list={['u-link', { active: isActive(l.href) }]}>
+						{l.label}
+					</a>
+				))
+			}
+		</nav>
+
+		<div class="actions">
+			<ThemeToggle />
+			<details class="m-menu">
+				<summary class="m-toggle" aria-label="Abrir menú de navegación">
+					<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+						<path
+							class="m-open"
+							d="M3 6h18M3 12h18M3 18h18"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"></path>
+						<path
+							class="m-close"
+							d="M6 6l12 12M18 6L6 18"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"></path>
+					</svg>
+				</summary>
+				<div class="m-panel">
+					<p class="m-label">Secciones</p>
+					{
+						utility.map((l) => (
+							<a href={l.href} class:list={['m-link', { active: isActive(l.href) }]}>
+								{l.label}
+							</a>
+						))
+					}
+					<p class="m-label">Categorías</p>
+					{
+						CATEGORIES.map((c) => (
+							<a
+								href={`/categoria/${c.slug}/`}
+								class:list={['m-link', { active: isCat(c.slug) }]}
+							>
+								{c.name}
+							</a>
+						))
+					}
+				</div>
+			</details>
+		</div>
+	</div>
+
+	<nav class="catbar" aria-label="Categorías">
+		<div class="catbar-track">
+			{
+				CATEGORIES.map((c) => (
+					<a
+						href={`/categoria/${c.slug}/`}
+						class:list={['cat-link', { active: isCat(c.slug) }]}
+					>
+						{c.name}
+					</a>
+				))
+			}
+		</div>
+	</nav>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 50;
+		background: color-mix(in srgb, var(--bg) 82%, transparent);
+		backdrop-filter: saturate(160%) blur(12px);
+		-webkit-backdrop-filter: saturate(160%) blur(12px);
+		border-bottom: 1px solid var(--border);
+	}
+	.bar {
+		width: var(--page-max);
+		max-width: calc(100% - 2 * var(--gutter));
+		margin-inline: auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4);
+		height: 62px;
+	}
+
+	/* Marca */
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
+		text-decoration: none;
+		color: var(--text);
+		font-family: var(--font-display);
+		font-weight: 680;
+		letter-spacing: -0.02em;
+		margin-right: auto;
+	}
+	.brand-mark {
+		display: grid;
+		place-items: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 9px;
+		background: linear-gradient(135deg, var(--violet), var(--cat));
+		color: #fff;
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		box-shadow: var(--shadow-accent);
+	}
+	.brand-name {
+		font-size: 1.05rem;
+	}
+
+	/* Nav utilitaria (desktop) */
+	.utility {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+	}
+	.u-link {
+		display: inline-block;
+		padding: 0.5em 0.85em;
+		border-radius: var(--radius-full);
+		color: var(--text-muted);
+		text-decoration: none;
+		font-size: 0.95rem;
+		font-weight: 500;
+		transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+	}
+	.u-link:hover {
+		color: var(--text);
+		background: var(--surface-2);
+	}
+	.u-link.active {
+		color: var(--accent);
+		background: var(--accent-soft);
+		font-weight: 600;
+	}
+
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	/* Barra de categorías (fila 2, desktop) */
+	.catbar {
+		border-top: 1px solid var(--border);
+	}
+	.catbar-track {
+		width: var(--page-max);
+		max-width: calc(100% - 2 * var(--gutter));
+		margin-inline: auto;
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+		height: 44px;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+	.catbar-track::-webkit-scrollbar {
+		display: none;
+	}
+	.cat-link {
+		flex: 0 0 auto;
+		padding: 0.4em 0.75em;
+		border-radius: var(--radius-full);
+		color: var(--text-muted);
+		text-decoration: none;
+		font-family: var(--font-display);
+		font-size: 0.88rem;
+		font-weight: 550;
+		letter-spacing: -0.005em;
+		white-space: nowrap;
+		transition: color var(--dur) var(--ease), background var(--dur) var(--ease);
+	}
+	.cat-link:hover {
+		color: var(--text);
+		background: var(--surface-2);
+	}
+	.cat-link.active {
+		color: var(--cat);
+		background: var(--cat-soft);
+		font-weight: 650;
+	}
+
+	/* Menú móvil (native <details>) — anula estilos globales de details/summary */
+	.m-menu {
+		display: none;
+		position: static;
+		border: 0;
+		border-radius: 0;
+		background: none;
+		margin: 0;
+		overflow: visible;
+	}
+	.m-toggle {
+		display: grid;
+		place-items: center;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border-radius: var(--radius-sm);
+		color: var(--text);
+		cursor: pointer;
+		list-style: none;
+	}
+	.m-toggle::-webkit-details-marker {
+		display: none;
+	}
+	.m-toggle::after {
+		content: none;
+	}
+	.m-toggle:hover {
+		background: var(--surface-2);
+	}
+	.m-toggle .m-close {
+		display: none;
+	}
+	.m-menu[open] .m-toggle .m-open {
+		display: none;
+	}
+	.m-menu[open] .m-toggle .m-close {
+		display: block;
+	}
+	.m-panel {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: var(--space-4) var(--gutter) var(--space-5);
+		background: var(--bg);
+		border-bottom: 1px solid var(--border);
+		box-shadow: var(--shadow-lg);
+		max-height: calc(100vh - 62px);
+		overflow-y: auto;
+	}
+	.m-label {
+		margin: var(--space-3) 0 var(--space-1);
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--text-subtle);
+	}
+	.m-label:first-child {
+		margin-top: 0;
+	}
+	.m-link {
+		padding: 0.7em 0.75em;
+		border-radius: var(--radius-sm);
+		color: var(--text);
+		text-decoration: none;
+		font-size: 1rem;
+		font-weight: 500;
+	}
+	.m-link:hover {
+		background: var(--surface-2);
+	}
+	.m-link.active {
+		color: var(--accent);
+		background: var(--accent-soft);
+		font-weight: 600;
+	}
+
+	/* Responsive: colapsar a menú móvil */
+	@media (max-width: 860px) {
+		.utility,
+		.catbar {
+			display: none;
+		}
+		.m-menu {
+			display: block;
+		}
+	}
+	@media (max-width: 430px) {
+		.brand-name {
+			display: none;
+		}
+	}
 </style>

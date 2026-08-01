@@ -1,0 +1,76 @@
+---
+import { SITE_AUTHOR, AUTHOR_BIO } from '../consts';
+
+interface Props {
+	name?: string;
+	bio?: string;
+}
+const { name = SITE_AUTHOR, bio = AUTHOR_BIO } = Astro.props;
+const initials = name
+	.split(/\s+/)
+	.slice(0, 2)
+	.map((w) => w[0])
+	.join('')
+	.toUpperCase();
+---
+
+<aside class="author">
+	<span class="author-avatar" aria-hidden="true">{initials}</span>
+	<div class="author-body">
+		<p class="author-eyebrow">Escrito por</p>
+		<p class="author-name">{name}</p>
+		<p class="author-bio">{bio}</p>
+		<a class="author-link" href="/about/">Más sobre el autor →</a>
+	</div>
+</aside>
+
+<style>
+	.author {
+		display: flex;
+		gap: var(--space-4);
+		align-items: flex-start;
+		padding: var(--space-5);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		background: var(--surface);
+	}
+	.author-avatar {
+		display: grid;
+		place-items: center;
+		flex: 0 0 auto;
+		width: 52px;
+		height: 52px;
+		border-radius: var(--radius-full);
+		font-family: var(--font-display);
+		font-weight: 700;
+		color: #fff;
+		background: linear-gradient(135deg, var(--violet), var(--cat));
+		box-shadow: var(--shadow-accent);
+	}
+	.author-eyebrow {
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--text-subtle);
+		margin: 0 0 0.15rem;
+	}
+	.author-name {
+		font-family: var(--font-display);
+		font-weight: 680;
+		font-size: 1.1rem;
+		margin: 0 0 var(--space-2);
+	}
+	.author-bio {
+		color: var(--text-muted);
+		font-size: 0.96rem;
+		margin: 0 0 var(--space-2);
+	}
+	.author-link {
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 0.9rem;
+		text-decoration: none;
+	}
+</style>

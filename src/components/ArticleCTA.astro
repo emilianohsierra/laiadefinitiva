@@ -1,0 +1,53 @@
+---
+interface Props {
+	title?: string;
+	text?: string;
+	href?: string;
+	cta?: string;
+}
+const {
+	title = '¿Te sirvió esta guía?',
+	text = 'Recibe la próxima directo en tu correo. Herramientas, tutoriales y estrategias de IA, sin relleno.',
+	href = '/#newsletter',
+	cta = 'Recibir la newsletter',
+} = Astro.props;
+---
+
+<aside class="cta">
+	<div class="cta-body">
+		<h2 class="cta-title">{title}</h2>
+		<p class="cta-text">{text}</p>
+	</div>
+	<a class="btn" href={href}>{cta}</a>
+</aside>
+
+<style>
+	.cta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-5);
+		flex-wrap: wrap;
+		padding: clamp(1.5rem, 1rem + 3vw, 2.5rem);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		background:
+			radial-gradient(120% 160% at 0% 0%, var(--accent-soft), transparent 60%),
+			radial-gradient(120% 160% at 100% 100%, var(--cat-soft), transparent 60%),
+			var(--surface);
+	}
+	.cta-body {
+		flex: 1 1 20rem;
+	}
+	.cta-title {
+		margin: 0 0 var(--space-2);
+		font-size: var(--fs-h3);
+	}
+	.cta-text {
+		margin: 0;
+		color: var(--text-muted);
+	}
+	.cta .btn {
+		flex: 0 0 auto;
+	}
+</style>

@@ -1,0 +1,135 @@
+---
+interface Props {
+	name: string;
+	rating?: number; // sobre 10
+	bestFor?: string;
+	price?: string;
+	firsthand?: boolean;
+	url?: string;
+	cta?: string;
+}
+const { name, rating, bestFor, price, firsthand = false, url, cta = 'Ver herramienta' } =
+	Astro.props;
+---
+
+<article class="toolcard">
+	<header class="tc-head">
+		<h3 class="tc-name">{name}</h3>
+		<div class="tc-badges">
+			{firsthand && <span class="tc-pill tc-firsthand">Usada de primera mano</span>}
+			{rating != null && (
+				<span class="tc-rating">
+					{rating}
+					<span class="tc-rating-max">/10</span>
+				</span>
+			)}
+		</div>
+	</header>
+
+	{
+		(bestFor || price) && (
+			<dl class="tc-meta">
+				{bestFor && (
+					<div>
+						<dt>Mejor para</dt>
+						<dd>{bestFor}</dd>
+					</div>
+				)}
+				{price && (
+					<div>
+						<dt>Precio</dt>
+						<dd>{price}</dd>
+					</div>
+				)}
+			</dl>
+		)
+	}
+
+	<div class="tc-body"><slot /></div>
+
+	{
+		url && (
+			<a class="btn tc-cta" href={url} target="_blank" rel="sponsored nofollow noopener">
+				{cta}
+			</a>
+		)
+	}
+</article>
+
+<style>
+	.toolcard {
+		margin: var(--space-6) 0;
+		padding: var(--space-5);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		background: var(--surface);
+		box-shadow: var(--shadow-sm);
+	}
+	.tc-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		flex-wrap: wrap;
+	}
+	.tc-name {
+		margin: 0;
+		font-size: var(--fs-h3);
+	}
+	.tc-badges {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
+	.tc-pill {
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		padding: 0.3em 0.6em;
+		border-radius: var(--radius-full);
+		color: var(--cat);
+		background: var(--cat-soft);
+	}
+	.tc-rating {
+		font-family: var(--font-display);
+		font-weight: 720;
+		font-size: 1.15rem;
+		color: var(--accent);
+	}
+	.tc-rating-max {
+		font-size: 0.8rem;
+		color: var(--text-subtle);
+		font-weight: 500;
+	}
+	.tc-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3) var(--space-6);
+		margin: var(--space-4) 0;
+		padding: var(--space-3) 0;
+		border-top: 1px solid var(--border);
+		border-bottom: 1px solid var(--border);
+	}
+	.tc-meta dt {
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-subtle);
+		margin-bottom: 0.15rem;
+	}
+	.tc-meta dd {
+		margin: 0;
+		font-weight: 550;
+	}
+	.tc-body :global(> :last-child) {
+		margin-bottom: 0;
+	}
+	.tc-cta {
+		margin-top: var(--space-4);
+	}
+</style>

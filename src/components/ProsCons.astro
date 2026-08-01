@@ -1,0 +1,87 @@
+---
+interface Props {
+	pros?: string[];
+	cons?: string[];
+}
+const { pros = [], cons = [] } = Astro.props;
+---
+
+<div class="proscons">
+	<div class="pc-col pc-pros">
+		<p class="pc-head">A favor</p>
+		<ul>
+			{pros.map((p) => <li>{p}</li>)}
+		</ul>
+	</div>
+	<div class="pc-col pc-cons">
+		<p class="pc-head">En contra</p>
+		<ul>
+			{cons.map((c) => <li>{c}</li>)}
+		</ul>
+	</div>
+</div>
+
+<style>
+	.proscons {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: var(--space-4);
+		margin: var(--space-6) 0;
+	}
+	.pc-col {
+		padding: var(--space-4) var(--space-5);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+	}
+	.pc-head {
+		font-family: var(--font-display);
+		font-weight: 680;
+		font-size: 0.82rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		margin: 0 0 var(--space-3);
+	}
+	.pc-pros {
+		border-top: 3px solid var(--success);
+	}
+	.pc-pros .pc-head {
+		color: var(--success);
+	}
+	.pc-cons {
+		border-top: 3px solid var(--danger);
+	}
+	.pc-cons .pc-head {
+		color: var(--danger);
+	}
+	.pc-col ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.pc-col li {
+		position: relative;
+		padding-left: 1.5em;
+		margin-bottom: var(--space-2);
+		color: var(--text);
+		font-size: 0.96rem;
+	}
+	.pc-col li::before {
+		position: absolute;
+		left: 0;
+		font-weight: 700;
+	}
+	.pc-pros li::before {
+		content: '+';
+		color: var(--success);
+	}
+	.pc-cons li::before {
+		content: '−';
+		color: var(--danger);
+	}
+	@media (max-width: 560px) {
+		.proscons {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

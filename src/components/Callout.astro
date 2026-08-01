@@ -1,0 +1,89 @@
+---
+type CalloutType = 'consejo' | 'importante' | 'advertencia' | 'recomendacion' | 'dato' | 'pro';
+
+interface Props {
+	type?: CalloutType;
+	title?: string;
+}
+const { type = 'consejo', title } = Astro.props;
+
+const META: Record<CalloutType, { label: string; icon: string }> = {
+	// icon = path(s) dentro de un viewBox 0 0 24 24
+	consejo: { label: 'Consejo', icon: 'M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.5.4.6.8.6 1.2v.5h6v-.5c0-.4.1-.8.6-1.2A6 6 0 0 0 12 3z' },
+	importante: { label: 'Importante', icon: 'M12 8v5M12 16.5v.5M12 3l9 16H3z' },
+	advertencia: { label: 'Advertencia', icon: 'M12 9v4M12 16.5v.5M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z' },
+	recomendacion: { label: 'Recomendación', icon: 'M20 6 9 17l-5-5' },
+	dato: { label: 'Dato', icon: 'M12 16v-5M12 8v.5M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z' },
+	pro: { label: 'Pro tip', icon: 'm12 3 2.09 5.26L20 9l-4 3.5L17 19l-5-3-5 3 1-6.5L4 9l5.91-.74L12 3z' },
+};
+const meta = META[type];
+const heading = title ?? meta.label;
+---
+
+<aside class={`callout callout--${type}`} role="note">
+	<span class="callout-icon" aria-hidden="true">
+		<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d={meta.icon}></path>
+		</svg>
+	</span>
+	<div class="callout-body">
+		<p class="callout-title">{heading}</p>
+		<div class="callout-content"><slot /></div>
+	</div>
+</aside>
+
+<style>
+	.callout {
+		--c: var(--accent);
+		--c-soft: var(--accent-soft);
+		display: flex;
+		gap: var(--space-3);
+		margin: var(--space-6) 0;
+		padding: var(--space-4) var(--space-5);
+		border: 1px solid var(--border);
+		border-left: 3px solid var(--c);
+		border-radius: var(--radius);
+		background: var(--c-soft);
+	}
+	.callout--consejo,
+	.callout--recomendacion {
+		--c: var(--success);
+		--c-soft: var(--success-soft);
+	}
+	.callout--advertencia {
+		--c: var(--warn);
+		--c-soft: var(--warn-soft);
+	}
+	.callout--dato {
+		--c: var(--info);
+		--c-soft: var(--info-soft);
+	}
+	.callout--importante {
+		--c: var(--danger);
+		--c-soft: var(--danger-soft);
+	}
+	.callout--pro {
+		--c: var(--accent);
+		--c-soft: var(--accent-soft);
+	}
+	.callout-icon {
+		flex: 0 0 auto;
+		color: var(--c);
+		margin-top: 0.1em;
+	}
+	.callout-title {
+		font-family: var(--font-display);
+		font-weight: 680;
+		font-size: 0.82rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--c);
+		margin: 0 0 0.25rem;
+	}
+	.callout-content :global(> :last-child) {
+		margin-bottom: 0;
+	}
+	.callout-content {
+		color: var(--text);
+	}
+</style>

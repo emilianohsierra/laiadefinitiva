@@ -1,0 +1,48 @@
+---
+interface Props {
+	headers: string[];
+	rows: (string | number)[][];
+	caption?: string;
+	highlightFirst?: boolean;
+}
+const { headers, rows, caption, highlightFirst = true } = Astro.props;
+---
+
+<figure class={`ctable ${highlightFirst ? 'ctable--hl' : ''}`}>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>{headers.map((h) => <th scope="col">{h}</th>)}</tr>
+			</thead>
+			<tbody>
+				{rows.map((row) => (
+					<tr>
+						{row.map((cell, i) =>
+							i === 0 ? <th scope="row">{cell}</th> : <td>{cell}</td>,
+						)}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+	{caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+	.ctable {
+		margin: var(--space-6) 0;
+	}
+	.ctable .table-wrap {
+		margin: 0;
+	}
+	.ctable--hl tbody th[scope='row'] {
+		font-family: var(--font-display);
+		font-weight: 620;
+		color: var(--text);
+		background: var(--surface-2);
+		white-space: nowrap;
+	}
+	.ctable figcaption {
+		margin-top: var(--space-2);
+	}
+</style>

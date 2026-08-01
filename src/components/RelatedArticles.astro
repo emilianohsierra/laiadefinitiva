@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleCard from './ArticleCard.astro';
+import { findCategory } from '../consts';
+
+interface Props {
+	currentId: string;
+	category?: string;
+	max?: number;
+}
+const { currentId, category, max = 3 } = Astro.props;
+
+const all = (await getCollection('blog'))
+	.filter((p) => !p.data.draft && p.id !== currentId)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const catSlug = findCategory(category)?.slug;
+const sameCat = catSlug
+	? all.filter((p) => findCategory(p.data.category)?.slug === catSlug)
+	: [];
+
+// Prioriza misma categoría; completa con lo más reciente sin repetir.
+const picked: typeof all = [];
+for (const p of [...sameCat, ...all]) {
+	if (picked.length >= max) break;
+	if (!picked.some((x) => x.id === p.id)) picked.push(p);
+}
+---
+
+{
+	picked.length > 0 && (
+		<section class="related" aria-labelledby="related-title">
+			<h2 id="related-title" class="related-title">
+				Sigue leyendo
+			</h2>
+			<div class="related-grid">
+				{picked.map((post) => (
+					<ArticleCard post={post} />
+				))}
+			</div>
+		</section>
+	)
+}
+
+<style>
+	.related-title {
+		font-size: var(--fs-h2);
+		margin: 0 0 var(--space-5);
+	}
+	.related-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--space-6) var(--space-5);
+	}
+	@media (max-width: 860px) {
+		.related-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (max-width: 560px) {
+		.related-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

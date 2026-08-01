@@ -1,141 +1,505 @@
 /*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
- */
+  Design System — La IA Definitiva
+  Sistema visual editorial premium (IA / tecnología).
+  Paleta "Definitiva": tinta + violeta eléctrico + verde-cian firma.
+  Light + Dark diseñados de forma independiente (no invertidos).
+*/
 
+/* ============================================================
+   1. TOKENS
+   ============================================================ */
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
-	--black: 15, 18, 25;
-	--gray: 96, 115, 159;
-	--gray-light: 229, 233, 240;
-	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
+	/* Marca */
+	--violet: #6d4aff;
+	--violet-600: #5a38e0;
+	--signal: #0e9e7e;
+
+	/* Color — LIGHT (por defecto) */
+	--bg: #fafaf9;
+	--surface: #ffffff;
+	--surface-2: #f4f4f2;
+	--surface-3: #ececea;
+	--text: #0b0f1a;
+	--text-muted: #545b68;
+	--text-subtle: #737b88;
+	--border: #e7e7e2;
+	--border-strong: #d8d8d1;
+
+	--accent: var(--violet);
+	--accent-hover: var(--violet-600);
+	--accent-contrast: #ffffff;
+	--accent-soft: rgba(109, 74, 255, 0.1);
+	--accent-ring: rgba(109, 74, 255, 0.35);
+
+	--cat: var(--signal);
+	--cat-soft: rgba(14, 158, 126, 0.12);
+
+	--info: #2563eb;
+	--info-soft: rgba(37, 99, 235, 0.1);
+	--warn: #b45309;
+	--warn-soft: rgba(180, 83, 9, 0.12);
+	--danger: #c8332b;
+	--danger-soft: rgba(200, 51, 43, 0.1);
+	--success: #0e9e7e;
+	--success-soft: rgba(14, 158, 126, 0.12);
+
+	/* Superficie de código (oscura en ambos temas para look premium) */
+	--code-bg: #0f1117;
+	--code-text: #e6e8ee;
+	--code-inline-bg: var(--surface-2);
+	--code-inline-text: #3b2a86;
+
+	/* Tipografía — --font-sans y --font-display los inyecta Astro (astro:assets Font)
+	   con la familia real auto-hospedada + fallbacks con ajuste métrico. */
+	--font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+	/* Escala de tipografía fluida */
+	--fs-body: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem);
+	--fs-lead: clamp(1.2rem, 1.08rem + 0.6vw, 1.4rem);
+	--fs-h1: clamp(2.3rem, 1.7rem + 2.9vw, 3.6rem);
+	--fs-h2: clamp(1.7rem, 1.35rem + 1.7vw, 2.4rem);
+	--fs-h3: clamp(1.35rem, 1.18rem + 0.85vw, 1.72rem);
+	--fs-h4: clamp(1.15rem, 1.06rem + 0.45vw, 1.35rem);
+	--fs-small: 0.875rem;
+	--fs-eyebrow: 0.78rem;
+
+	/* Espaciado */
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.5rem;
+	--space-6: 2rem;
+	--space-7: 3rem;
+	--space-8: 4rem;
+	--space-9: 6rem;
+
+	/* Anchos */
+	--prose-width: 46rem; /* ~72ch, lectura óptima */
+	--wide-width: 68rem;
+	--page-max: 76rem;
+	--gutter: clamp(1rem, 0.5rem + 2.5vw, 2.5rem);
+
+	/* Radios */
+	--radius-sm: 8px;
+	--radius: 14px;
+	--radius-lg: 22px;
+	--radius-full: 999px;
+
+	/* Sombras (suaves, editoriales) */
+	--shadow-sm: 0 1px 2px rgba(11, 15, 26, 0.06), 0 1px 1px rgba(11, 15, 26, 0.04);
+	--shadow: 0 2px 6px rgba(11, 15, 26, 0.06), 0 10px 24px rgba(11, 15, 26, 0.07);
+	--shadow-lg: 0 8px 24px rgba(11, 15, 26, 0.08), 0 24px 60px rgba(11, 15, 26, 0.12);
+	--shadow-accent: 0 10px 30px rgba(109, 74, 255, 0.25);
+
+	/* Movimiento */
+	--dur: 180ms;
+	--dur-slow: 320ms;
+	--ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	--bg: #0a0c10;
+	--surface: #12151b;
+	--surface-2: #171b22;
+	--surface-3: #1f242d;
+	--text: #e8eaed;
+	--text-muted: #a2aab6;
+	--text-subtle: #838c99;
+	--border: rgba(255, 255, 255, 0.09);
+	--border-strong: rgba(255, 255, 255, 0.16);
+
+	--accent: #8b6bff;
+	--accent-hover: #a184ff;
+	--accent-contrast: #0a0c10;
+	--accent-soft: rgba(139, 107, 255, 0.16);
+	--accent-ring: rgba(139, 107, 255, 0.45);
+
+	--cat: #2ae0ae;
+	--cat-soft: rgba(42, 224, 174, 0.14);
+
+	--info: #60a5fa;
+	--info-soft: rgba(96, 165, 250, 0.14);
+	--warn: #fbbf5c;
+	--warn-soft: rgba(251, 191, 92, 0.14);
+	--danger: #ff6b61;
+	--danger-soft: rgba(255, 107, 97, 0.14);
+	--success: #2ae0ae;
+	--success-soft: rgba(42, 224, 174, 0.14);
+
+	--code-bg: #0d1016;
+	--code-inline-bg: rgba(255, 255, 255, 0.06);
+	--code-inline-text: #c9bcff;
+
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 12px 28px rgba(0, 0, 0, 0.5);
+	--shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.55), 0 24px 70px rgba(0, 0, 0, 0.6);
+
+	color-scheme: dark;
+}
+
+/* ============================================================
+   2. RESET / BASE
+   ============================================================ */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+html {
+	-webkit-text-size-adjust: 100%;
+	scroll-behavior: smooth;
 }
 body {
-	font-family: var(--font-atkinson);
 	margin: 0;
 	padding: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: var(--font-sans);
+	font-size: var(--fs-body);
+	line-height: 1.7;
 	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-feature-settings: 'cv11', 'ss01';
+	transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
+
 main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
+	width: var(--prose-width);
+	max-width: calc(100% - 2 * var(--gutter));
+	margin-inline: auto;
+	padding: var(--space-7) 0 var(--space-8);
 }
+
+/* ============================================================
+   3. TIPOGRAFÍA
+   ============================================================ */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
-	line-height: 1.2;
+	margin: 0 0 var(--space-3);
+	color: var(--text);
+	font-family: var(--font-display);
+	font-weight: 680;
+	line-height: 1.12;
+	letter-spacing: -0.02em;
+	text-wrap: balance;
 }
 h1 {
-	font-size: 3.052em;
+	font-size: var(--fs-h1);
+	font-weight: 720;
+	letter-spacing: -0.035em;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: var(--fs-h2);
+	margin-top: var(--space-7);
 }
 h3 {
-	font-size: 1.953em;
+	font-size: var(--fs-h3);
+	margin-top: var(--space-6);
 }
 h4 {
-	font-size: 1.563em;
+	font-size: var(--fs-h4);
+	margin-top: var(--space-5);
 }
-h5 {
-	font-size: 1.25em;
+p {
+	margin: 0 0 var(--space-5);
+	text-wrap: pretty;
+}
+.lead {
+	font-size: var(--fs-lead);
+	line-height: 1.55;
+	color: var(--text-muted);
 }
 strong,
 b {
-	font-weight: 700;
+	font-weight: 660;
+	color: var(--text);
 }
+small {
+	font-size: var(--fs-small);
+}
+
 a {
 	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.18em;
+	text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+	transition: color var(--dur) var(--ease), text-decoration-color var(--dur) var(--ease);
 }
 a:hover {
+	color: var(--accent-hover);
+	text-decoration-color: currentColor;
+}
+
+ul,
+ol {
+	margin: 0 0 var(--space-5);
+	padding-left: 1.4em;
+}
+li {
+	margin-bottom: var(--space-2);
+}
+li::marker {
 	color: var(--accent);
 }
-p {
-	margin-bottom: 1em;
+
+hr {
+	border: none;
+	border-top: 1px solid var(--border);
+	margin: var(--space-7) 0;
 }
-.prose p {
-	margin-bottom: 2em;
+
+/* ============================================================
+   4. CITAS / NOTAS (blockquote = callout base)
+   ============================================================ */
+blockquote {
+	margin: var(--space-6) 0;
+	padding: var(--space-4) var(--space-5);
+	background: var(--surface-2);
+	border: 1px solid var(--border);
+	border-left: 3px solid var(--accent);
+	border-radius: var(--radius);
+	color: var(--text-muted);
+	font-size: 1rem;
 }
-textarea {
-	width: 100%;
-	font-size: 16px;
+blockquote p:last-child {
+	margin-bottom: 0;
 }
-input {
-	font-size: 16px;
+blockquote strong {
+	color: var(--text);
 }
-table {
-	width: 100%;
-}
-img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
-}
+
+/* ============================================================
+   5. CÓDIGO
+   ============================================================ */
 code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
+	font-family: var(--font-mono);
+	font-size: 0.9em;
+	background: var(--code-inline-bg);
+	color: var(--code-inline-text);
+	padding: 0.15em 0.4em;
+	border-radius: 6px;
+	border: 1px solid var(--border);
 }
 pre {
-	padding: 1.5em;
-	border-radius: 8px;
+	background: var(--code-bg);
+	color: var(--code-text);
+	padding: var(--space-5);
+	border-radius: var(--radius);
+	overflow-x: auto;
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-sm);
+	line-height: 1.6;
+	font-size: 0.92rem;
 }
 pre > code {
 	all: unset;
+	font-family: var(--font-mono);
 }
-blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
+
+/* ============================================================
+   6. TABLAS (base para ComparisonTable)
+   ============================================================ */
+.table-wrap {
+	overflow-x: auto;
+	margin: var(--space-6) 0;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-sm);
+	-webkit-overflow-scrolling: touch;
 }
-hr {
-	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+	background: var(--surface);
 }
-@media (max-width: 720px) {
-	body {
-		font-size: 18px;
-	}
-	main {
-		padding: 1em;
-	}
+thead th {
+	position: sticky;
+	top: 0;
+	background: var(--surface-2);
+	color: var(--text);
+	font-family: var(--font-display);
+	font-weight: 620;
+	text-align: left;
+	white-space: nowrap;
+}
+th,
+td {
+	padding: var(--space-3) var(--space-4);
+	border-bottom: 1px solid var(--border);
+	vertical-align: top;
+}
+tbody tr:last-child td {
+	border-bottom: none;
+}
+tbody tr:hover {
+	background: var(--surface-2);
+}
+
+/* ============================================================
+   7. IMÁGENES
+   ============================================================ */
+img {
+	max-width: 100%;
+	height: auto;
+	border-radius: var(--radius);
+}
+figure {
+	margin: var(--space-6) 0;
+}
+figure img {
+	display: block;
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-sm);
+}
+figcaption {
+	margin-top: var(--space-2);
+	font-size: var(--fs-small);
+	color: var(--text-subtle);
+	text-align: center;
+}
+
+/* ============================================================
+   8. FAQ nativo (<details>) — indexable, sin JS
+   ============================================================ */
+details {
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	background: var(--surface);
+	margin-bottom: var(--space-3);
+	overflow: hidden;
+	transition: border-color var(--dur) var(--ease);
+}
+details[open] {
+	border-color: var(--border-strong);
+}
+summary {
+	cursor: pointer;
+	padding: var(--space-4) var(--space-5);
+	font-family: var(--font-display);
+	font-weight: 600;
+	list-style: none;
+	display: flex;
+	justify-content: space-between;
+	gap: var(--space-4);
+	align-items: center;
+}
+summary::-webkit-details-marker {
+	display: none;
+}
+summary::after {
+	content: '+';
+	color: var(--accent);
+	font-size: 1.4em;
+	line-height: 1;
+	transition: transform var(--dur) var(--ease);
+}
+details[open] summary::after {
+	transform: rotate(45deg);
+}
+details > :not(summary) {
+	padding: 0 var(--space-5) var(--space-4);
+	color: var(--text-muted);
+}
+
+/* ============================================================
+   9. UTILIDADES / ESTADOS
+   ============================================================ */
+::selection {
+	background: var(--accent-soft);
+	color: var(--text);
+}
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+	border-radius: 4px;
 }
 
 .sr-only {
-	border: 0;
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
 	padding: 0;
 	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
 	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
 	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+	border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* ============================================================
+   10. BOTONES (utilidad compartida)
+   ============================================================ */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	font-family: var(--font-display);
+	font-weight: 600;
+	font-size: 0.95rem;
+	line-height: 1;
+	padding: 0.75em 1.25em;
+	border-radius: var(--radius-full);
+	background: var(--accent);
+	color: var(--accent-contrast);
+	text-decoration: none;
+	border: 1px solid transparent;
+	cursor: pointer;
+	transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+		background var(--dur) var(--ease);
+}
+.btn:hover {
+	background: var(--accent-hover);
+	color: var(--accent-contrast);
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-accent);
+}
+.btn-ghost {
+	background: transparent;
+	color: var(--text);
+	border-color: var(--border-strong);
+}
+.btn-ghost:hover {
+	background: var(--surface-2);
+	color: var(--text);
+	border-color: var(--accent);
+	box-shadow: none;
+}
+
+/* ============================================================
+   11. ARTÍCULO / PROSE
+   ============================================================ */
+/* Compensa la cabecera fija al saltar a un ancla del índice */
+:is(h2, h3, h4)[id] {
+	scroll-margin-top: 96px;
+}
+
+/* Entradilla: el primer párrafo del artículo se lee como lead */
+.prose > p:first-of-type {
+	font-size: var(--fs-lead);
+	line-height: 1.55;
+	color: var(--text-muted);
 }

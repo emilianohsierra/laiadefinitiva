@@ -1,0 +1,74 @@
+---
+interface Props {
+	title?: string;
+	rating?: number; // sobre 10
+	verdict?: string;
+}
+const { title = 'En resumen', rating, verdict } = Astro.props;
+---
+
+<aside class="quicktake">
+	<div class="qt-head">
+		<p class="qt-title">{title}</p>
+		{rating != null && (
+			<span class="qt-rating">
+				{rating}<span class="qt-max">/10</span>
+			</span>
+		)}
+	</div>
+	{verdict && <p class="qt-verdict">{verdict}</p>}
+	<div class="qt-body"><slot /></div>
+</aside>
+
+<style>
+	.quicktake {
+		margin: var(--space-6) 0;
+		padding: var(--space-5);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-lg);
+		background:
+			radial-gradient(120% 160% at 100% 0%, var(--accent-soft), transparent 55%),
+			var(--surface);
+	}
+	.qt-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-3);
+		margin-bottom: var(--space-2);
+	}
+	.qt-title {
+		font-family: var(--font-display);
+		font-size: var(--fs-eyebrow);
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--accent);
+		margin: 0;
+	}
+	.qt-rating {
+		font-family: var(--font-display);
+		font-weight: 720;
+		font-size: 1.4rem;
+		color: var(--accent);
+		line-height: 1;
+	}
+	.qt-max {
+		font-size: 0.8rem;
+		color: var(--text-subtle);
+		font-weight: 500;
+	}
+	.qt-verdict {
+		font-family: var(--font-display);
+		font-weight: 620;
+		font-size: 1.1rem;
+		line-height: 1.35;
+		margin: 0 0 var(--space-2);
+	}
+	.qt-body :global(> :last-child) {
+		margin-bottom: 0;
+	}
+	.qt-body {
+		color: var(--text-muted);
+	}
+</style>

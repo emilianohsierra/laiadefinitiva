@@ -1,0 +1,147 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import { CATEGORIES, findCategory, SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	return CATEGORIES.map((c) => ({
+		params: { category: c.slug },
+		props: { category: c },
+	}));
+}
+
+const { category } = Astro.props;
+
+const posts = (await getCollection('blog'))
+	.filter((p) => !p.data.draft && findCategory(p.data.category)?.slug === category.slug)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const count = posts.length;
+const title = `${category.name} — ${SITE_TITLE}`;
+const description = `Guías y comparativas de ${category.name}: herramientas de IA probadas en proyectos reales, sin humo.`;
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<Header />
+		<main class="cat-page">
+			<header class="cat-hero" style={`--h:${category.hue}`}>
+				<nav class="crumbs" aria-label="Ruta">
+					<a href="/">Inicio</a>
+					<span aria-hidden="true">/</span>
+					<span>Categorías</span>
+				</nav>
+				<h1 class="cat-h1">{category.name}</h1>
+				<p class="cat-count">
+					{count === 0 ? 'Sin artículos por ahora' : `${count} ${count === 1 ? 'artículo' : 'artículos'}`}
+				</p>
+			</header>
+
+			{
+				count > 0 ? (
+					<div class="grid">
+						{posts.map((post) => (
+							<ArticleCard post={post} />
+						))}
+					</div>
+				) : (
+					<section class="empty">
+						<p>Todavía no hay artículos en <strong>{category.name}</strong>.</p>
+						<p>
+							Mientras tanto, explora <a href="/blog/">todos los artículos</a> o vuelve al{' '}
+							<a href="/">inicio</a>.
+						</p>
+					</section>
+				)
+			}
+
+			<section class="nl-wrap">
+				<Newsletter />
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.cat-page {
+		width: var(--page-max);
+		max-width: calc(100% - 2 * var(--gutter));
+	}
+
+	.cat-hero {
+		position: relative;
+		margin-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+		padding: clamp(2rem, 1.2rem + 4vw, 3.5rem) clamp(1.25rem, 0.5rem + 3vw, 2.5rem);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--border);
+		overflow: hidden;
+		background:
+			radial-gradient(120% 140% at 0% 0%, hsl(var(--h) 70% 55% / 0.16), transparent 55%),
+			radial-gradient(120% 140% at 100% 100%, hsl(calc(var(--h) + 40) 70% 55% / 0.12), transparent 55%),
+			var(--surface);
+	}
+	.crumbs {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		font-size: var(--fs-small);
+		color: var(--text-subtle);
+		margin-bottom: var(--space-3);
+	}
+	.crumbs a {
+		color: var(--text-muted);
+		text-decoration: none;
+	}
+	.crumbs a:hover {
+		color: var(--accent);
+	}
+	.cat-h1 {
+		margin: 0 0 var(--space-2);
+		font-size: var(--fs-h1);
+	}
+	.cat-count {
+		margin: 0;
+		color: var(--text-muted);
+		font-family: var(--font-display);
+		font-weight: 500;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: var(--space-7) var(--space-5);
+	}
+	@media (max-width: 900px) {
+		.grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+	@media (max-width: 600px) {
+		.grid {
+			grid-template-columns: 1fr;
+			gap: var(--space-6);
+		}
+	}
+
+	.empty {
+		padding: var(--space-7) 0 var(--space-8);
+		text-align: center;
+		color: var(--text-muted);
+	}
+	.empty p {
+		margin: 0 0 var(--space-3);
+	}
+
+	.nl-wrap {
+		margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+	}
+</style>
